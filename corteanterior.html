@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mi Corte</title>
+    <link rel="stylesheet" href="cortes.css" />
+  </head>
+  <body>
+    <header>
+      <nav id="nav-bar">
+        <ul>
+          <li><a href="/index.html">Mapa</a></li>
+          <li><a href="/">Cortes Anteriores</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h3>Ventas Anteriores</h3>
+      <table id="occupiedRoomsTable" border="1">
+        <thead>
+          <tr>
+            <th>Ticket</th>
+            <th>Habitación</th>
+            <th>Hora de Registro</th>
+            <th>Placas</th>
+            <th>Tipo</th>
+            <th>Precio</th>
+          </tr>
+        </thead>
+        <tbody id="occupiedRoomsList"></tbody>
+      </table>
+
+      <h3 id="finalBalance"></h3>
+    </main>
+
+    <script src="corteanterior.js"></script>
+  </body>
+</html>
