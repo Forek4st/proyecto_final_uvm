@@ -16,13 +16,22 @@ document.addEventListener("DOMContentLoaded", () => {
       ? Math.max(...occupiedRooms.map((room) => room.id)) + 1
       : 1;
 
-    constructor(roomType, basePrice, hours, roomNumber, guestPlates, guestId) {
+    constructor(
+      roomType,
+      basePrice,
+      hours,
+      roomNumber,
+      guestPlates,
+      guestModel,
+      guestId
+    ) {
       this.id = Room.id++;
       this.roomType = roomType;
       this.basePrice = basePrice;
       this.hours = hours;
       this.roomNumber = roomNumber;
       this.guestPlates = guestPlates;
+      this.guestModel = guestModel;
       this.guestId = guestId.toUpperCase();
       this.roomRegisterTime = new Date().toLocaleString("es-MX");
       this.ISH = basePrice * Room.ISH;
@@ -68,7 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const roomType = getRoomType(roomNumber);
     const hours = parseInt(form.hours.value);
     const guestPlates = form.guestPlates.value.toUpperCase();
-    const guestId = form.guestId.value.toUpperCase();
+    const guestModel = form.guestModel.value.toUpperCase();
+    const guestId = form.guestId.value ? form.guestId.value.toUpperCase() : "*";
 
     if (!roomType || isNaN(hours) || isNaN(roomNumber) || !guestId) {
       return;
@@ -82,6 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
       hours,
       roomNumber,
       guestPlates,
+      guestModel,
       guestId
     );
 
