@@ -228,11 +228,10 @@ main h1 {
 
 #activeRoomModal .modal-content-active {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Dos columnas */
+  grid-template-columns: repeat(2, 1fr);
   height: 500px;
-  gap: 1rem; /* Espaciado entre tarjetas */
+  gap: 1rem;
   align-items: center;
-
   background: -webkit-linear-gradient(0deg, #16222a, #3a6073);
   background: linear-gradient(0deg, #16222a, #3a6073);
   padding: 30px;
@@ -249,7 +248,7 @@ main h1 {
   position: absolute;
   top: 10px;
   right: 20px;
-  font-size: 20px;
+  font-size: 28px;
   font-weight: bold;
   cursor: pointer;
 }
@@ -258,38 +257,11 @@ main h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-
-  padding: 10px;
-  text-decoration: none;
-  transition: background-color 0.3s ease;
-  color: whitesmoke;
-}
-
-#activeRoomModal .activeModal-container img {
-  max-width: 24px;
-  height: auto;
-  fill: white;
-}
-
-#activeRoomModal .activeModal-container a {
-  display: flex;
-  align-items: center;
-  justify-content: start;
-  gap: 10px;
   padding: 10px;
   text-decoration: none;
   transition: background-color 0.3s ease;
   color: whitesmoke;
   position: relative;
-}
-
-#activeRoomModal .activeModal-container a {
-  display: flex;
-  align-items: center;
-  gap: 10px; /* Espaciado entre el ícono y el texto */
-  position: relative;
-  text-decoration: none;
-  color: #fff; /* Asegúrate de que el texto sea visible */
 }
 
 #activeRoomModal .activeModal-container a span {
@@ -317,4 +289,5 @@ main h1 {
 #activeRoomModal .activeModal-container img {
   max-width: 24px;
   height: auto;
+  fill: white;
 }
