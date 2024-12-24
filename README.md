@@ -28,7 +28,7 @@ Las habitaciones ocupadas se resaltan con un color de fondo diferente.
 Haz clic en una habitación ocupada para abrir el modal de habitación activa.
 Llamada a API Simulada:
 
-La aplicación simula una llamada a API para obtener datos de habitaciones desde un archivo JSON local utilizando la API fetch.
+La aplicación simula una llamada a API para obtener datos de habitaciones desde un archivo JSON local utilizando la API fetch en el apartado "Mas cortes"
 
 ## Estructura de Archivos
 index.html: El archivo HTML principal de la aplicación.
