@@ -157,9 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const occupiedRoomStatus = () => {
-    roomDivs.map((room) => room.classList.remove("active"));
+    roomDivs.forEach((room) => room.classList.remove("active"));
 
-    occupiedRooms.map((room) => {
+    occupiedRooms.forEach((room) => {
       const roomElement = document.querySelector(
         `.room[data-room="${room.roomNumber}"]`
       );
