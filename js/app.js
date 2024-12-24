@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("roomModal");
-  const closeModal = document.querySelector(".close");
+  const activeModal = document.getElementById("activeRoomModal");
+  const closeModalButtons = document.querySelectorAll(".close");
   const hoursSelect = document.getElementById("hours");
   const roomNumberInput = document.getElementById("roomNumber");
   const roomDivs = document.querySelectorAll(".room");
@@ -115,19 +116,24 @@ document.addEventListener("DOMContentLoaded", () => {
     .querySelector("#createRoomForm")
     .addEventListener("submit", createNewRoom);
 
+  const openActiveModal = () => {
+    activeModal.style.display = "block";
+  };
+
   const openModal = (event) => {
     const roomElement = event.target;
     if (roomElement.classList.contains("active")) {
-      return;
-    }
-    const roomNumber = roomElement.getAttribute("data-room");
-    const roomType = getRoomType(roomNumber);
-    const roomRegisterTitle = document.querySelector(".room-register");
-    roomRegisterTitle.textContent = `Habitación ${roomNumber} ${roomType}`;
+      openActiveModal();
+    } else {
+      const roomNumber = roomElement.getAttribute("data-room");
+      const roomType = getRoomType(roomNumber);
+      const roomRegisterTitle = document.querySelector(".room-register");
+      roomRegisterTitle.textContent = `Habitación ${roomNumber} ${roomType}`;
 
-    roomNumberInput.value = roomNumber;
-    updateHours(roomType);
-    modal.style.display = "block";
+      roomNumberInput.value = roomNumber;
+      updateHours(roomType);
+      modal.style.display = "block";
+    }
   };
 
   roomDivs.forEach((room) => {
@@ -140,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
       hoursSelect.innerHTML = '<option value="6">6</option>';
     } else {
       const hours = [6, 9, 12, 24];
-      hours.map((hour) => {
+      hours.forEach((hour) => {
         hoursSelect.innerHTML += `<option value="${hour}">${hour}</option>`;
       });
     }
@@ -148,21 +154,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const closeModalHandler = () => {
     modal.style.display = "none";
+    activeModal.style.display = "none";
   };
 
   window.onclick = (event) => {
-    if (event.target === modal) {
+    if (event.target === modal || event.target === activeModal) {
       closeModalHandler();
     }
   };
 
-  roomDivs.forEach((room) => {
-    room.addEventListener("click", openModal);
+  closeModalButtons.forEach((closeBtn) => {
+    closeBtn.onclick = closeModalHandler;
   });
-
-  if (closeModal) {
-    closeModal.onclick = closeModalHandler;
-  }
 
   const occupiedRoomStatus = () => {
     roomDivs.forEach((room) => room.classList.remove("active"));

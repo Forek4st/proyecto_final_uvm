@@ -106,6 +106,18 @@ button {
   color: whitesmoke;
 }
 
+.activeRoomModal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: black;
+}
+
 section {
   display: flex;
   margin: 1rem auto;
@@ -148,7 +160,7 @@ section div {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  color: black;
+  color: whitesmoke;
 }
 
 .modal-content {
@@ -159,7 +171,7 @@ section div {
   border-radius: 8px;
   width: 80%;
   max-width: 500px;
-  color: black;
+  color: whitesmoke;
 }
 
 .close {
