@@ -15,13 +15,13 @@ document.addEventListener("DOMContentLoaded", () => {
       : 1;
 
     constructor(
-      roomType,
-      basePrice,
-      hours,
-      roomNumber,
-      guestPlates,
-      guestModel,
-      guestId
+      roomType = "",
+      basePrice = 0,
+      hours = 0,
+      roomNumber = "",
+      guestPlates = "",
+      guestModel = "",
+      guestId = ""
     ) {
       this.id = Room.id++;
       this.roomType = roomType;
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
       hoursSelect.innerHTML = '<option value="6">6</option>';
     } else {
       const hours = [6, 9, 12, 24];
-      hours.forEach((hour) => {
+      hours.map((hour) => {
         hoursSelect.innerHTML += `<option value="${hour}">${hour}</option>`;
       });
     }
@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  roomDivs.forEach((room) => {
+  roomDivs.map((room) => {
     room.addEventListener("click", openModal);
   });
 
@@ -157,9 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const occupiedRoomStatus = () => {
-    roomDivs.forEach((room) => room.classList.remove("active"));
+    roomDivs.map((room) => room.classList.remove("active"));
 
-    occupiedRooms.forEach((room) => {
+    occupiedRooms.map((room) => {
       const roomElement = document.querySelector(
         `.room[data-room="${room.roomNumber}"]`
       );

@@ -16,21 +16,30 @@ const renderCorte = async () => {
   const data = await fetchData();
   const $occupiedRoomsList = document.querySelector("#occupiedRoomsList");
   $occupiedRoomsList.innerHTML = "";
-  data.map((room) => {
-    $occupiedRoomsList.innerHTML += `
+  data.map(
+    ({
+      id = "",
+      roomNumber = "",
+      roomRegisterTime = "",
+      guestPlates = "",
+      roomType = "",
+      totalPrice = 0,
+    }) => {
+      $occupiedRoomsList.innerHTML += `
          <tr>
-      <td>${room.id}</td>
-      <td>${room.roomNumber}</td>
-      <td>${room.roomRegisterTime}</td>
-      <td>${room.guestPlates}</td>
-      <td>${room.roomType}</td>
-      <td>${room.totalPrice.toLocaleString("es-MX", {
+      <td>${id}</td>
+      <td>${roomNumber}</td>
+      <td>${roomRegisterTime}</td>
+      <td>${guestPlates}</td>
+      <td>${roomType}</td>
+      <td>${totalPrice.toLocaleString("es-MX", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}</td>
     </tr>
         `;
-  });
+    }
+  );
 };
 
 renderCorte();
