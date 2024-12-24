@@ -6,18 +6,21 @@
   box-sizing: border-box;
   font-family: "Montserrat", sans-serif;
   font-size: 18px;
+  color: whitesmoke;
 }
 
 #nav-bar {
   display: flex;
   align-items: center;
-  padding: 0 2rem;
+  padding: 0 3.5rem;
   height: 100px;
   background-color: #191916;
 }
 
-#nav-bar img {
-  height: 4rem;
+#nav-bar a img {
+  display: block;
+
+  height: 2.5rem;
 }
 
 #nav-bar ul {
@@ -58,12 +61,13 @@ nav ul li.active:before {
 }
 
 main {
+  background: -webkit-linear-gradient(0deg, #16222a, #3a6073);
+  background: linear-gradient(0deg, #16222a, #3a6073);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
-  margin: 100px auto;
+  margin: auto;
   padding: 20px;
 }
 

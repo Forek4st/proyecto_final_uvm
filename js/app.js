@@ -1,6 +1,4 @@
-// Esperar que el DOM esté completamente cargado antes de ejecutar cualquier acción
 document.addEventListener("DOMContentLoaded", () => {
-  // Obtener referencias del DOM
   const modal = document.getElementById("roomModal");
   const closeModal = document.querySelector(".close");
   const hoursSelect = document.getElementById("hours");
@@ -96,8 +94,6 @@ document.addEventListener("DOMContentLoaded", () => {
       guestId
     );
 
-    console.log("New room: ", newRoom);
-
     updateOccupiedRooms(newRoom);
 
     Toastify({
@@ -125,17 +121,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const roomRegisterTitle = document.querySelector(".room-register");
     roomRegisterTitle.textContent = `Habitación ${roomNumber} ${roomType}`;
 
-    // Actualizar valores en el formulario
     roomNumberInput.value = roomNumber;
     updateHours(roomType);
-
-    // Mostrar el modal
     modal.style.display = "block";
   };
 
-  // Actualizar las opciones de horas según el tipo de habitación
   const updateHours = (roomType) => {
-    hoursSelect.innerHTML = ""; // Limpiar opciones previas
+    hoursSelect.innerHTML = "";
     if (roomType === "Jacuzzi") {
       hoursSelect.innerHTML = '<option value="6">6</option>';
     } else {
@@ -150,28 +142,23 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.style.display = "none";
   };
 
-  // Cerrar modal al hacer clic fuera de él
   window.onclick = (event) => {
     if (event.target === modal) {
       closeModalHandler();
     }
   };
 
-  // Agregar eventos a las habitaciones
   roomDivs.forEach((room) => {
     room.addEventListener("click", openModal);
   });
 
-  // Evento para cerrar modal
   if (closeModal) {
     closeModal.onclick = closeModalHandler;
   }
 
   const occupiedRoomStatus = () => {
-    // Limpiar clases activas
     roomDivs.forEach((room) => room.classList.remove("active"));
 
-    // Agregar clase "active" a las habitaciones ocupadas
     occupiedRooms.forEach((room) => {
       const roomElement = document.querySelector(
         `.room[data-room="${room.roomNumber}"]`
@@ -190,7 +177,6 @@ document.addEventListener("DOMContentLoaded", () => {
     occupiedRoomStatus();
   };
 
-  // Botón para finalizar sesión
   const endSessionButton = document.querySelector(".endSession");
   if (endSessionButton) {
     endSessionButton.addEventListener("click", clearLocalStorage);

@@ -1,11 +1,11 @@
 const fetchData = async () => {
   try {
-    const response = await fetch("./corteFake.json");
+    const response = await fetch("../corteFake.json");
     if (!response.ok) {
       throw new Error(response.status);
     }
     const data = await response.json();
-    console.log(data);
+
     return data;
   } catch (error) {
     console.error(error);

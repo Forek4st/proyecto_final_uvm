@@ -3,19 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <title>Mi Corte</title>
-    <link rel="stylesheet" href="cortes.css" />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
   </head>
   <body>
     <header>
       <nav id="nav-bar">
-        <a href="/"><img src="/pyrofavicon.png" alt="" /></a>
+        <a href="/"><img src="../assets/pyrofavicon.svg" alt="" /></a>
         <ul>
           <li><a href="/">Mapa</a></li>
+          <li><a href="./corteanterior.html">Mas Cortes</a></li>
         </ul>
       </nav>
     </header>
-    <main>
-      <h3>Ventas Anteriores</h3>
+    <main class="corte-rooms">
+      <h1>Registro de Habitaciones</h1>
       <table id="occupiedRoomsTable" border="1">
         <thead>
           <tr>
@@ -33,6 +38,6 @@
       <h3 id="finalBalance"></h3>
     </main>
 
-    <script src="corteanterior.js"></script>
+    <script src="../js/corte.js"></script>
   </body>
 </html>
