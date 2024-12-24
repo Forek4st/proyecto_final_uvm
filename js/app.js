@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  roomDivs.map((room) => {
+  roomDivs.forEach((room) => {
     room.addEventListener("click", openModal);
   });
 
