@@ -116,7 +116,11 @@ document.addEventListener("DOMContentLoaded", () => {
     .addEventListener("submit", createNewRoom);
 
   const openModal = (event) => {
-    const roomNumber = event.target.getAttribute("data-room");
+    const roomElement = event.target;
+    if (roomElement.classList.contains("active")) {
+      return;
+    }
+    const roomNumber = roomElement.getAttribute("data-room");
     const roomType = getRoomType(roomNumber);
     const roomRegisterTitle = document.querySelector(".room-register");
     roomRegisterTitle.textContent = `Habitación ${roomNumber} ${roomType}`;
@@ -125,6 +129,10 @@ document.addEventListener("DOMContentLoaded", () => {
     updateHours(roomType);
     modal.style.display = "block";
   };
+
+  roomDivs.forEach((room) => {
+    room.addEventListener("click", openModal);
+  });
 
   const updateHours = (roomType) => {
     hoursSelect.innerHTML = "";
