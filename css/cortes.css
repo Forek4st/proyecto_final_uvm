@@ -98,3 +98,7 @@ main h3 {
   padding: 1rem;
   text-align: center;
 }
+
+.active-header {
+  display: flex;
+}

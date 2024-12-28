@@ -32,7 +32,14 @@ document.addEventListener("DOMContentLoaded", () => {
       this.guestPlates = guestPlates;
       this.guestModel = guestModel;
       this.guestId = guestId.toUpperCase();
-      this.roomRegisterTime = new Date().toLocaleString("es-MX");
+      this.roomRegisterTime = new Date().toLocaleString("es-MX", {
+        hour12: false,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
       this.ISH = basePrice * Room.ISH;
       this.IVA = basePrice * Room.IVA;
       this.totalPrice = Math.ceil(basePrice + this.ISH + this.IVA);
@@ -116,25 +123,91 @@ document.addEventListener("DOMContentLoaded", () => {
     .querySelector("#createRoomForm")
     .addEventListener("submit", createNewRoom);
 
-  const openActiveModal = () => {
+  const calculateEndTime = (startDateTime, hours) => {
+    const [date, time] = startDateTime.split(", ");
+    const [day, month, year] = date.split("/").map(Number);
+    let [hour, minute] = time.split(":").map(Number);
+
+    const startDate = new Date(year, month - 1, day, hour, minute);
+
+    const endDate = new Date(startDate.getTime() + hours * 60 * 60 * 1000);
+
+    const endDay = endDate.getDate().toString().padStart(2, "0");
+    const endMonth = (endDate.getMonth() + 1).toString().padStart(2, "0");
+    const endYear = endDate.getFullYear();
+    const endHour = endDate.getHours().toString().padStart(2, "0");
+    const endMinute = endDate.getMinutes().toString().padStart(2, "0");
+
+    return `${endDay}/${endMonth}/${endYear}, ${endHour}:${endMinute}`;
+  };
+
+  const openActiveModal = (
+    roomNumber,
+    guestPlates,
+    id,
+    roomRegisterTime,
+    hours,
+    guestModel
+  ) => {
     activeModal.style.display = "block";
+    const $roomPlates = document.querySelector(".active-room-plates");
+    const $roomId = document.querySelector(".active-room-id");
+    const $roomIn = document.querySelector(".active-room-in");
+    const $roomOut = document.querySelector(".active-room-out");
+    const $roomNumber = document.querySelector(".active-room-info");
+    const $roomTimeLeft = document.querySelector(".active-room-timeleft");
+    const $roomModel = document.querySelector(".active-room-model");
+    const $roomTime = document.querySelector(".active-room-time");
+
+    const endTime = calculateEndTime(roomRegisterTime, hours);
+
+    $roomNumber.textContent = `${roomNumber}`;
+    $roomPlates.textContent = `Placas: ${guestPlates}`;
+    $roomId.textContent = `ID: ${id}`;
+    $roomIn.textContent = `Hora de Entrada: ${roomRegisterTime}`;
+    $roomOut.textContent = ` Hora de Salida: ${endTime}`;
+    $roomTimeLeft.textContent = `${hours} Horas`;
+    $roomModel.textContent = `Modelo: ${guestModel}`;
+    $roomTime.textContent = `Tiempo: ${hours} Horas`;
   };
 
   const openModal = (event) => {
     const roomElement = event.target;
+    const roomNumber = roomElement.getAttribute("data-room");
     if (roomElement.classList.contains("active")) {
-      openActiveModal();
+      const occupiedRooms =
+        JSON.parse(localStorage.getItem("occupiedRooms")) || [];
+      const roomData = occupiedRooms.find(
+        (room) => room.roomNumber === roomNumber
+      );
+      const guestPlates = roomData ? roomData.guestPlates : "N/A";
+      const id = roomData ? roomData.guestId : "N/A";
+      const roomRegisterTime = roomData ? roomData.roomRegisterTime : "N/A";
+      const hours = roomData ? roomData.hours : "N/A";
+      const guestModel = roomData ? roomData.guestModel : "N/A";
+      openActiveModal(
+        roomNumber,
+        guestPlates,
+        id,
+        roomRegisterTime,
+        hours,
+        guestModel
+      );
     } else {
-      const roomNumber = roomElement.getAttribute("data-room");
       const roomType = getRoomType(roomNumber);
       const roomRegisterTitle = document.querySelector(".room-register");
       roomRegisterTitle.textContent = `Habitación ${roomNumber} ${roomType}`;
 
       roomNumberInput.value = roomNumber;
+
       updateHours(roomType);
       modal.style.display = "block";
     }
   };
+
+  roomDivs.forEach((room) => {
+    room.addEventListener("click", openModal);
+  });
 
   roomDivs.forEach((room) => {
     room.addEventListener("click", openModal);
