@@ -6,45 +6,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const roomNumberInput = document.getElementById("roomNumber");
   const roomDivs = document.querySelectorAll(".room");
 
-  let occupiedRooms = JSON.parse(localStorage.getItem("occupiedRooms")) || [];
+  // API base URL
+  const API_BASE_URL = "http://127.0.0.1:8000";
 
-  class Room {
-    static ISH = 0.04;
-    static IVA = 0.16;
-    static id = occupiedRooms.length
-      ? Math.max(...occupiedRooms.map((room) => room.id)) + 1
-      : 1;
-
-    constructor(
-      roomType = "",
-      basePrice = 0,
-      hours = 0,
-      roomNumber = "",
-      guestPlates = "",
-      guestModel = "",
-      guestId = ""
-    ) {
-      this.id = Room.id++;
-      this.roomType = roomType;
-      this.basePrice = basePrice;
-      this.hours = hours;
-      this.roomNumber = roomNumber;
-      this.guestPlates = guestPlates;
-      this.guestModel = guestModel;
-      this.guestId = guestId.toUpperCase();
-      this.roomRegisterTime = new Date().toLocaleString("es-MX", {
-        hour12: false,
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-      this.ISH = basePrice * Room.ISH;
-      this.IVA = basePrice * Room.IVA;
-      this.totalPrice = Math.ceil(basePrice + this.ISH + this.IVA);
-    }
-  }
+  // Remove the Room class as backend handles room creation
 
   const basePrices = {
     Jacuzzi: 583.33,
@@ -70,13 +35,28 @@ document.addEventListener("DOMContentLoaded", () => {
     return jacuzziRooms.includes(num) ? "Jacuzzi" : "Sencilla";
   };
 
-  const updateOccupiedRooms = (newRoom) => {
-    occupiedRooms.push(newRoom);
-    localStorage.setItem("occupiedRooms", JSON.stringify(occupiedRooms));
-    occupiedRoomStatus();
+  // Fetch occupied rooms from backend
+  const fetchOccupiedRooms = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/rooms`);
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          occupiedRooms = result.data; // Only active rooms
+          occupiedRoomStatus();
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching rooms:", error);
+    }
   };
 
-  const createNewRoom = (event) => {
+  const updateOccupiedRooms = async () => {
+    // Refresh data from backend
+    await fetchOccupiedRooms();
+  };
+
+  const createNewRoom = async (event) => {
     event.preventDefault();
     const form = event.target;
     const roomNumber = form.roomNumber.value;
@@ -92,31 +72,73 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const basePriceValue = basePrice(roomType, hours);
 
-    const newRoom = new Room(
-      roomType,
-      basePriceValue,
-      hours,
-      roomNumber,
-      guestPlates,
-      guestModel,
-      guestId
-    );
+    // Preparar datos para el POST request
+    const roomData = {
+      roomType: roomType,
+      basePrice: basePriceValue,
+      hours: hours,
+      roomNumber: roomNumber,
+      guestPlates: guestPlates,
+      guestModel: guestModel,
+      guestId: guestId,
+    };
 
-    updateOccupiedRooms(newRoom);
+    try {
+      // Hacer POST request al backend
+      const response = await fetch(`${API_BASE_URL}/rooms`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(roomData),
+      });
 
-    Toastify({
-      text: `Habitación ${roomNumber} registrada exitosamente por ${hours} horas`,
-      duration: 5000,
-      className: "info",
-      gravity: "bottom",
-      position: "right",
-      style: {
-        background: "#ff3399",
-      },
-    }).showToast();
+      const result = await response.json();
 
-    form.reset();
-    modal.style.display = "none";
+      if (response.ok && result.success) {
+        // Actualizar el estado desde el backend
+        await updateOccupiedRooms();
+
+        Toastify({
+          text: `Habitación ${roomNumber} registrada exitosamente por ${hours} horas`,
+          duration: 5000,
+          className: "info",
+          gravity: "bottom",
+          position: "right",
+          style: {
+            background: "#ff3399",
+          },
+        }).showToast();
+
+        form.reset();
+        modal.style.display = "none";
+      } else {
+        // Manejar errores del servidor
+        Toastify({
+          text:
+            result.message || result.detail || "Error al registrar habitación",
+          duration: 5000,
+          className: "error",
+          gravity: "bottom",
+          position: "right",
+          style: {
+            background: "#ff3399",
+          },
+        }).showToast();
+      }
+    } catch (error) {
+      console.error("Error al crear habitación:", error);
+      Toastify({
+        text: "Error de conexión con el servidor",
+        duration: 5000,
+        className: "error",
+        gravity: "bottom",
+        position: "right",
+        style: {
+          background: "#ff3399",
+        },
+      }).showToast();
+    }
   };
 
   document
@@ -169,14 +191,157 @@ document.addEventListener("DOMContentLoaded", () => {
     $roomTimeLeft.textContent = `${hours} Horas`;
     $roomModel.textContent = `Modelo: ${guestModel}`;
     $roomTime.textContent = `Tiempo: ${hours} Horas`;
+
+    // Add checkout functionality to existing button
+    const roomData = occupiedRooms.find(
+      (room) => room.roomNumber === roomNumber
+    );
+    if (roomData) {
+      // Find the existing checkout button in the HTML
+      const checkoutBtn = document.querySelector(".checkout-btn");
+
+      // Remove any existing event listeners by cloning the element
+      if (checkoutBtn) {
+        const newCheckoutBtn = checkoutBtn.cloneNode(true);
+        checkoutBtn.parentNode.replaceChild(newCheckoutBtn, checkoutBtn);
+
+        // Add the checkout event listener
+        newCheckoutBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          checkoutRoom(roomData.roomNumber);
+        });
+      }
+
+      // Find the existing update room button in the HTML
+      const updateRoomBtn = document.querySelector(".update-room");
+
+      // Remove any existing event listeners by cloning the element
+      if (updateRoomBtn) {
+        const newUpdateRoomBtn = updateRoomBtn.cloneNode(true);
+        updateRoomBtn.parentNode.replaceChild(newUpdateRoomBtn, updateRoomBtn);
+
+        // Add the update room event listener
+        newUpdateRoomBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          showChangeRoomModal(roomData.roomNumber);
+        });
+      }
+    }
+  };
+
+  const checkoutRoom = async (roomNumber) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/rooms/${roomNumber}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          isActive: false,
+        }),
+      });
+
+      if (response.ok) {
+        await updateOccupiedRooms();
+        activeModal.style.display = "none";
+
+        Toastify({
+          text: `Habitación ${roomNumber} finalizada exitosamente`,
+          duration: 3000,
+          className: "info",
+          gravity: "bottom",
+          position: "right",
+          style: {
+            background: "#ff3399",
+          },
+        }).showToast();
+      } else {
+        const result = await response.json();
+        Toastify({
+          text: result.detail || "Error al realizar checkout",
+          duration: 3000,
+          className: "error",
+          gravity: "bottom",
+          position: "right",
+          style: {
+            background: "#ff3399",
+          },
+        }).showToast();
+      }
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      Toastify({
+        text: "Error de conexión con el servidor",
+        duration: 3000,
+        className: "error",
+        gravity: "bottom",
+        position: "right",
+        style: {
+          background: "#ff3399",
+        },
+      }).showToast();
+    }
+  };
+
+  const updateRoomNumber = async (roomNumber) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/rooms/${roomNumber}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          roomNumber: "1",
+        }),
+      });
+
+      if (response.ok) {
+        await updateOccupiedRooms();
+        activeModal.style.display = "none";
+
+        Toastify({
+          text: `Habitación ${roomNumber} cambiada a habitación 01 exitosamente`,
+          duration: 5000,
+          className: "info",
+          gravity: "bottom",
+          position: "right",
+          style: {
+            background: "#ff3399",
+          },
+        }).showToast();
+      } else {
+        const result = await response.json();
+        Toastify({
+          text: result.detail || "Error al cambiar habitación",
+          duration: 3000,
+          className: "error",
+          gravity: "bottom",
+          position: "right",
+          style: {
+            background: "#ff3399",
+          },
+        }).showToast();
+      }
+    } catch (error) {
+      console.error("Error during room update:", error);
+      Toastify({
+        text: "Error de conexión con el servidor",
+        duration: 3000,
+        className: "error",
+        gravity: "bottom",
+        position: "right",
+        style: {
+          background: "#ff3399",
+        },
+      }).showToast();
+    }
   };
 
   const openModal = (event) => {
     const roomElement = event.target;
     const roomNumber = roomElement.getAttribute("data-room");
     if (roomElement.classList.contains("active")) {
-      const occupiedRooms =
-        JSON.parse(localStorage.getItem("occupiedRooms")) || [];
+      // Find room data from occupiedRooms array (from backend)
       const roomData = occupiedRooms.find(
         (room) => room.roomNumber === roomNumber
       );
@@ -244,8 +409,10 @@ document.addEventListener("DOMContentLoaded", () => {
     roomDivs.forEach((room) => room.classList.remove("active"));
 
     occupiedRooms.forEach((room) => {
+      // Normalize room number to remove leading zeros
+      const normalizedRoomNumber = parseInt(room.roomNumber, 10).toString();
       const roomElement = document.querySelector(
-        `.room[data-room="${room.roomNumber}"]`
+        `.room[data-room="${normalizedRoomNumber}"]`
       );
       if (roomElement) {
         roomElement.classList.add("active");
@@ -253,16 +420,235 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  occupiedRoomStatus();
-
-  const clearLocalStorage = () => {
-    localStorage.clear();
-    occupiedRooms = [];
-    occupiedRoomStatus();
-  };
+  // Initial load of occupied rooms
+  fetchOccupiedRooms();
 
   const endSessionButton = document.querySelector(".endSession");
   if (endSessionButton) {
-    endSessionButton.addEventListener("click", clearLocalStorage);
+    endSessionButton.addEventListener("click", () => {
+      console.log("End session button clicked - functionality disabled");
+    });
   }
+
+  // Variables para el modal de cambio de habitación
+  const changeRoomModal = document.getElementById("changeRoomModal");
+  let currentRoomToChange = null;
+
+  // Función para obtener habitaciones disponibles del mismo tipo
+  const getAvailableRooms = async (currentRoomNumber) => {
+    const currentRoomType = getRoomType(currentRoomNumber);
+    const allRooms = [];
+
+    // Generar lista de habitaciones según el tipo
+    if (currentRoomType === "Jacuzzi") {
+      // Solo habitaciones Jacuzzi (15, 16, 17, 18)
+      jacuzziRooms.forEach((roomNum) => {
+        if (roomNum.toString() !== currentRoomNumber) {
+          allRooms.push(roomNum.toString());
+        }
+      });
+    } else {
+      // Solo habitaciones Sencillas (1-32 excluyendo Jacuzzi y 13 y 0)
+      for (let i = 1; i <= 32; i++) {
+        if (
+          i === 13 ||
+          jacuzziRooms.includes(i) ||
+          i.toString() === currentRoomNumber
+        )
+          continue;
+        allRooms.push(i.toString());
+      }
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/rooms`);
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          const occupiedRoomNumbers = result.data.map((room) =>
+            parseInt(room.roomNumber, 10).toString()
+          );
+
+          return allRooms.filter(
+            (roomNum) => !occupiedRoomNumbers.includes(roomNum)
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching available rooms:", error);
+    }
+    return [];
+  };
+
+  // Función para mostrar el modal de cambio de habitación
+  const showChangeRoomModal = async (currentRoomNumber) => {
+    currentRoomToChange = currentRoomNumber;
+    const currentRoomType = getRoomType(currentRoomNumber);
+    const availableRooms = await getAvailableRooms(currentRoomNumber);
+
+    const roomsGrid = document.querySelector(".available-rooms-grid");
+    roomsGrid.innerHTML = "";
+
+    // Crear título informativo
+    const title = document.createElement("p");
+    title.textContent = `Cambiar habitación ${currentRoomType} ${currentRoomNumber} a:`;
+    title.style.cssText =
+      "margin-bottom: 15px; font-weight: bold; text-align: center;";
+    roomsGrid.appendChild(title);
+
+    if (availableRooms.length === 0) {
+      const noRoomsMsg = document.createElement("p");
+      noRoomsMsg.textContent = `No hay habitaciones ${currentRoomType.toLowerCase()} disponibles`;
+      noRoomsMsg.style.cssText = "text-align: center; color: #666;";
+      roomsGrid.appendChild(noRoomsMsg);
+    } else {
+      // Crear select
+      const selectContainer = document.createElement("div");
+      selectContainer.style.cssText = "text-align: center; margin: 20px 0;";
+
+      const select = document.createElement("select");
+      select.id = "roomSelect";
+      select.style.cssText = `
+        padding: 10px 15px;
+        font-size: 16px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        background: white;
+        cursor: pointer;
+        min-width: 200px;
+      `;
+
+      // Opción por defecto
+      const defaultOption = document.createElement("option");
+      defaultOption.value = "";
+      defaultOption.textContent = "Seleccionar habitación";
+      defaultOption.disabled = true;
+      defaultOption.selected = true;
+      select.appendChild(defaultOption);
+
+      // Agregar opciones disponibles
+      availableRooms.forEach((roomNum) => {
+        const option = document.createElement("option");
+        option.value = roomNum;
+        option.textContent = `Habitación ${roomNum}`;
+        select.appendChild(option);
+      });
+
+      selectContainer.appendChild(select);
+      roomsGrid.appendChild(selectContainer);
+
+      // Crear botón de confirmar
+      const buttonContainer = document.createElement("div");
+      buttonContainer.style.cssText = "text-align: center; margin-top: 20px;";
+
+      const confirmBtn = document.createElement("button");
+      confirmBtn.textContent = "Cambiar Habitación";
+      confirmBtn.style.cssText = `
+        padding: 10px 20px;
+        background: #ff3399;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-right: 10px;
+      `;
+      confirmBtn.disabled = true;
+
+      // Habilitar botón cuando se seleccione una opción
+      select.addEventListener("change", () => {
+        confirmBtn.disabled = !select.value;
+        confirmBtn.style.background = select.value ? "#ff3399" : "#ccc";
+      });
+
+      // Confirmar cambio
+      confirmBtn.addEventListener("click", () => {
+        if (select.value) {
+          selectNewRoom(select.value);
+        }
+      });
+
+      buttonContainer.appendChild(confirmBtn);
+      roomsGrid.appendChild(buttonContainer);
+    }
+
+    changeRoomModal.style.display = "block";
+  };
+
+  // Función para seleccionar nueva habitación
+  const selectNewRoom = async (newRoomNumber) => {
+    if (!currentRoomToChange) return;
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/rooms/${currentRoomToChange}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            roomNumber: newRoomNumber,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        await updateOccupiedRooms();
+        changeRoomModal.style.display = "none";
+        activeModal.style.display = "none";
+
+        Toastify({
+          text: `Habitación cambiada de ${currentRoomToChange} a ${newRoomNumber} exitosamente`,
+          duration: 5000,
+          className: "info",
+          gravity: "bottom",
+          position: "right",
+          style: {
+            background: "#ff3399",
+          },
+        }).showToast();
+      } else {
+        const result = await response.json();
+        Toastify({
+          text: result.detail || "Error al cambiar habitación",
+          duration: 3000,
+          className: "error",
+          gravity: "bottom",
+          position: "right",
+          style: {
+            background: "#ff3399",
+          },
+        }).showToast();
+      }
+    } catch (error) {
+      console.error("Error changing room:", error);
+      Toastify({
+        text: "Error de conexión con el servidor",
+        duration: 3000,
+        className: "error",
+        gravity: "bottom",
+        position: "right",
+        style: {
+          background: "#ff3399",
+        },
+      }).showToast();
+    }
+  };
+
+  // Event listeners para el modal de cambio de habitación
+  const closeChangeModal = document.getElementById("closeChangeModal");
+
+  if (closeChangeModal) {
+    closeChangeModal.addEventListener("click", () => {
+      changeRoomModal.style.display = "none";
+    });
+  }
+
+  // Cerrar modal al hacer click fuera
+  window.addEventListener("click", (event) => {
+    if (event.target === changeRoomModal) {
+      changeRoomModal.style.display = "none";
+    }
+  });
 });

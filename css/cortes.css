@@ -73,7 +73,24 @@ main {
 
 #occupiedRoomsTable {
   margin: 3rem;
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 20px;
 }
+
+#occupiedRoomsTable th,
+#occupiedRoomsTable td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+#occupiedRoomsTable th {
+  background-color: #191916;
+  color: white;
+  font-weight: bold;
+}
+
 main h3 {
   font-size: 2rem;
   margin-top: 2rem;
@@ -101,4 +118,32 @@ main h3 {
 
 .active-header {
   display: flex;
+}
+
+/* Estilos para el estado de las habitaciones */
+.room-active {
+  background-color: rgba(0, 176, 155, 0.1);
+}
+
+.room-inactive {
+  background-color: rgba(150, 150, 150, 0.1);
+  opacity: 0.7;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.status-badge.active {
+  background-color: #00b09b;
+  color: white;
+}
+
+.status-badge.inactive {
+  background-color: #6c757d;
+  color: white;
 }

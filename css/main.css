@@ -402,3 +402,75 @@ main h1 {
 .active-room-main-info p {
   margin: 1.5rem 0;
 }
+
+/* Estilos para el modal de cambio de habitación */
+#changeRoomModal .modal-content {
+  max-width: 400px;
+  width: 90%;
+}
+
+.available-rooms-grid {
+  padding: 20px;
+  text-align: center;
+}
+
+.available-rooms-grid button {
+  padding: 20px;
+  text-align: center;
+  background-color: #fe466c;
+}
+
+.available-rooms-grid select {
+  padding: 10px 15px !important;
+  font-size: 16px !important;
+
+  border-radius: 5px !important;
+
+  cursor: pointer !important;
+  min-width: 200px !important;
+}
+
+.available-rooms-grid select:focus {
+  outline: none;
+  border-color: none !important;
+}
+
+.available-rooms-grid button {
+  padding: 10px 20px !important;
+  background-color: #fe466c !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 5px !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  transition: background 0.3s ease;
+}
+
+.available-rooms-grid button:disabled {
+  background: #ccc !important;
+  cursor: not-allowed !important;
+}
+
+.available-rooms-grid button:hover:not(:disabled) {
+  background: #1fb700 !important;
+}
+
+.change-room-actions {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.change-room-actions button {
+  padding: 10px 20px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.change-room-actions button:hover {
+  background: #5a6268;
+}

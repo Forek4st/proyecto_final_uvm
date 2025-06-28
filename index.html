@@ -139,14 +139,14 @@
                 >
               </div>
               <div>
-                <a href="#"
+                <a href="#" class="update-room"
                   ><img src="./assets/roomchange.svg" alt="" /><span
                     >Cambiar Habitacion</span
                   ></a
                 >
               </div>
               <div>
-                <a href="#"
+                <a href="#" class="checkout-btn""
                   ><img src="./assets/end.svg" alt="" /><span
                     >Finalizar</span
                   ></a
@@ -186,6 +186,19 @@
             <input type="hidden" name="roomNumber" id="roomNumber" />
             <button type="submit">REGISTRAR</button>
           </form>
+        </div>
+      </div>
+      <!-- Modal para cambiar habitación -->
+      <div class="modal" id="changeRoomModal">
+        <div class="modal-content">
+          <div class="content-header">
+            <h2>Seleccionar Nueva Habitación</h2>
+            <span class="close" id="closeChangeModal">X</span>
+          </div>
+          <div class="available-rooms-grid">
+            <!-- Las habitaciones disponibles se cargarán dinámicamente aquí -->
+          </div>
+         
         </div>
       </div>
     </main>
