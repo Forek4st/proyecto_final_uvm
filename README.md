@@ -171,13 +171,3 @@ La API REST incluye los siguientes endpoints principales:
 
 - Email: janeirojm91@gmail.com
 - GitHub: [@Forek4st](https://github.com/Forek4st)
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia ISC. Ver el archivo `package.json` para más detalles.
-
-## 🙏 Reconocimientos
-
-- Proyecto desarrollado como trabajo final para CoderHouse
-- FastAPI por su excelente documentación
-- Toastify.js por las notificaciones elegantes
